@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html ng-app="app">
+  <head>
+    
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even){background-color: #f2f2f2}
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+</style>
+  </head>
+  <body>
+    
+
+    <ng-view></ng-view>
+
+    <!-- Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-route.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-resource.min.js"></script>
+         <script>
+                 $(function () {
+                  var socket = io();
+                  $('#form1').submit(function(){
+                    socket.emit('chat message', $('#m1').val(), "0");
+                    $('#m1').val('');
+                    return false;
+                  });
+                  $('#form2').submit(function(){
+                    socket.emit('chat message', $('#m2').val(),"1");
+                    $('#m2').val('');
+                    return false;
+                  });
+                  socket.on('chat message', function(msg,id){ 
+                      var arr = ["#messages1","#messages2"];
+                      var id1 = arr[id];
+                      arr.splice(parseInt(id),1)
+                      var id2 = arr[0]
+                      debugger
+                     $(id1).append($('<div style="text-align:left">').text(msg));
+                     $(id2).append($('<div style="text-align:right">').text(msg));
+                                         
+                  });
+                });
+                
+        </script>
+
+      <script type="text/ng-template" id="/chat.html">
+      <h1><%= title %></h1>
+          <a href="#/">GO TO HOME PAGE</a>
+         <div>
+
+  
+                <style>
+                  * { margin: 0; padding: 0; box-sizing: border-box; }
+                  body { font: 13px Helvetica, Arial; }
+                  form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 40%; }
+                  form input  { border: 0; padding: 10px; width: 85%; margin-right: .5%; }
+                  form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+                  #messages1 { list-style-type: none; margin: 0; padding: 0; }
+                  #messages1 div { padding: 5px 10px;border: 0; padding: 10px; width: 85%; margin-right: .5%; }
+                  #messages1 div:nth-child(odd) { background: #eee; border: 0; padding: 10px; width: 85%; margin-right: .5%; }
+                  #messages2 { list-style-type: none; margin: 0; padding: 0; }
+                  #messages2 div { padding: 5px 10px; padding: 5px 10px;border: 0; padding: 10px; width: 85%; margin-right: .5%; }
+                  #messages2 div:nth-child(odd) { background: #eee;border: 0; padding: 10px; width: 85%; margin-right: .5%;  }
+                </style>
+             
+
+            
+
+                  
+              <body>
+                
+                <table>
+                <tr>
+                <td style="width:50%">
+                <div id="messages1" width="30%"></div>
+                <form id="form1"action="">
+                  <input id="m1" autocomplete="off" /><button>Send</button>
+                </form>
+                </td>
+                <td style="width:50%">
+                <div id="messages2" width="45%"></div>
+                <form id = "form2" action="">
+                  <input id="m2" autocomplete="off" /><button>Send</button>
+                </form>
+                </td>
+                </tr>
+                </table>
+              </body>
+          
+        </div> 
+
+      </script>
+    <!-- Template -->
+    <script type="text/ng-template" id="/table.html">
+    <h1><%= title %></h1>
+    <br><br>
+     <a href="#/">GO TO HOME PAGE</a>
+        <div>
+          Search: <input type="text" ng-model="search.name">
+        </div>
+        <br/><br/>
+        <div >
+            Name : <input type="text" ng-model="name">
+            Age : <input type="number" ng-model="age">
+            Qualification : <input type="text" ng-model="qualification">
+            Place : <input type="text" ng-model="place">
+            <br><br>
+     
+            <table>
+              
+                <th>Name</th>
+                <th>Age</th>
+                <th>Qualification</th>
+                <th>Place</th>
+                <th>Operations</th>
+                <button ng-click="saveTable()">Add to table</button>
+                <tr ng-repeat="table in table | filter : search">
+                  <td>
+                      <span ng-show="!editing[$index]">{{table.name}}</span>
+                      <input ng-show="editing[$index]" type="text" ng-model="table.name"></td>
+                  <td>
+                    <span ng-show="!editing[$index]">{{table.age}}</span> 
+                    <input ng-show="editing[$index]" type="text" ng-model="table.age"></td>
+                  <td>
+                      <span ng-show="!editing[$index]">{{table.qualification}}</span> 
+                      <input ng-show="editing[$index]" type="text" ng-model="table.qualification"></td>
+                  <td>
+                      <span ng-show="!editing[$index]">{{table.place}}</span> 
+                      <input ng-show="editing[$index]" type="text" ng-model="table.place"></td>
+                  <td>
+                    <button ng-show="!editing[$index]" ng-click="removeTable($index)">remove</button>
+                    <button ng-show="!editing[$index]" ng-click="editTable($index)">edit</button>
+                    
+                    <button ng-show="editing[$index]" ng-click="updateTable($index)">Update</button>
+                    <button ng-show="editing[$index]" ng-click="cancelTable($index)">Cancel</button>
+                  </td>
+                </tr>
+            </table>
+
+      </div>
+     
+    </script>
+
+
+   <script type="text/ng-template" id="/index.html">
+    <h1><%= title %></h1>
+    <ul>
+     <li> <a href="#/table">GET, POST, UPDATE, AND DELETE OPERATION ON TABLE</a> </li>
+      <li><a href="#/chat">CHAT ROOM EXAMPLE WITH SOCKET IO</a></li>
+     
+    </script>
+
+
+    <script>
+      angular.module('app', ['ngRoute', 'ngResource'])
+
+        //---------------
+        // Services
+        //---------------
+
+
+        .factory('Table', ['$resource', function($resource){
+          return $resource('/table/:id', null, {
+            'update': { method:'PUT' }
+          });
+        }])
+
+        //---------------
+        // Controllers
+        //---------------
+        .controller('TableController', ['$scope', 'Table', function ($scope, Table) {
+          $scope.editing = [];
+
+          $scope.table = Table.query();
+          debugger
+          $scope.saveTable = function(){
+            //if(!$scope.newTable || $scope.newTable.length < 1) return;
+            var table = new Table({ name: $scope.name,age:$scope.age,qualification:$scope.qualification,place:$scope.place, completed: false });
+
+            table.$save(function(){
+              $scope.table.push(table);
+              $scope.newTable = ''; // clear textbox
+            });
+
+          }
+          $scope.updateTable = function(index){
+            var table = $scope.table[index];
+            Table.update({id: table._id}, table);
+            $scope.editing[index] = false;
+          }
+
+          $scope.editTable = function(index){
+            $scope.editing[index] = angular.copy($scope.table[index]);
+          }
+
+          $scope.cancelTable = function(index){
+            $scope.table[index] = angular.copy($scope.editing[index]);
+            $scope.editing[index] = false;
+          }
+
+           $scope.removeTable = function(index){
+            var table = $scope.table[index];
+            Table.remove({id: table._id}, function(){
+              $scope.table.splice(index, 1);
+            });
+          }
+         
+        }])
+
+
+       
+
+        .config(['$routeProvider', function ($routeProvider) {
+          $routeProvider
+            .when('/', {
+              templateUrl: '/index.html',
+              controller: 'IndexController'
+            })
+            .when('/table', {
+              templateUrl: '/table.html',
+              controller: 'TableController'
+            })
+             .when('/chat', {
+              templateUrl: '/chat.html',
+              controller: 'chatController'
+            })
+        }]);
+    </script>
+  </body>
+</html>
